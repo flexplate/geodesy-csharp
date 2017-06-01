@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace geodesy_csharp
 {
     public class OsGridRef
-    {
+    {    
+        /// <summary>
+        /// Creates an OsGridRef object.
+        /// </summary>
+        /// <param name="easting">Easting in metres from OS false origin.</param>
+        /// <param name="northing">Northing in metres from OS false origin.</param>
+        /// <example>var grid = new OsGridRef(651409, 313177);</example>
         public OsGridRef(int easting, int northing)
         {
             Easting = easting;
@@ -17,7 +19,17 @@ namespace geodesy_csharp
         public int Easting { get; set; }
         public int Northing { get; set; }
 
-
+        /// <summary>Converts Ordnance Survey grid reference easting/northing coordinate to latitude/longitude (SW corner of grid square).
+        /// 
+        /// Note formulation implemented here due to Thomas, Redfearn, etc is as published by OS, but is
+        /// inferior to Krüger as used by e.g. Karney 2011.</summary>
+        ///<param name="gridRef">Grid ref E/N to be converted to lat/long (SW corner of grid square).</param>
+        ///<param name="datum">Datum to convert grid reference into.</param>
+        ///<example>var gridref = new OsGridRef(651409.903, 313177.270);
+        /// var pWgs84 = OsGridRef.osGridToLatLon(gridref);                     // 52°39′28.723″N, 001°42′57.787″E
+        /// to obtain (historical) OSGB36 latitude/longitude point:
+        /// var pOsgb = OsGridRef.osGridToLatLon(gridref, LatLon.datum.OSGB36); // 52°39′27.253″N, 001°43′04.518″E
+        ///</example>
         public LatLon ToLatLon(OsGridRef gridRef, Datum datum)
         {
             var E = gridRef.Easting;

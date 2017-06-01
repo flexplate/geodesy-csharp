@@ -4,6 +4,12 @@ namespace geodesy_csharp
 {
     public class LatLon
     {
+        /// <summary>
+        /// Creates lat/lon(polar) point with latitude & longitude values, on a specified datum.
+        /// </summary>
+        /// <param name="latitude">Geodetic latitude in degrees.</param>
+        /// <param name="longitude">Longitude in degrees.</param>
+        /// <param name="datum">Datum this point is defined within.</param>
         public LatLon(double latitude, double longitude, Datum datum)
         {
             this.Latitude = latitude;
@@ -14,8 +20,15 @@ namespace geodesy_csharp
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public Datum Datum { get; set; }
-        
 
+        /// <summary>
+        /// /Converts ‘this’ lat/lon coordinate to new coordinate system.
+        /// </summary>
+        /// <param name="toDatum">Datum this coordinate is to be converted to.</param>
+        /// <example>
+        /// var pWGS84 = new LatLon(51.4778, -0.0016, Datum.WGS84);
+        /// var pOSGB = pWGS84.convertDatum(Datum.OSGB36); // 51.4773°N, 000.0000°E
+        /// </example>
         public LatLon ConvertDatum(Datum toDatum)
         {
             LatLon OldLatLon = this;
@@ -52,6 +65,9 @@ namespace geodesy_csharp
 
         }
 
+        /// <summary>
+        /// Converts ‘this’ point from (geodetic) latitude/longitude coordinates to (geocentric) cartesian (x/y/z) coordinates.
+        /// </summary>
         private Vector3D ToCartesian()
         {
             var φ = this.Latitude.ToRadians();
@@ -76,5 +92,5 @@ namespace geodesy_csharp
 
             return point;
         }
-    }    
+    }
 }

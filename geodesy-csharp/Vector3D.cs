@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace geodesy_csharp
 {
@@ -19,6 +15,10 @@ namespace geodesy_csharp
         public double Y { get; set; }
         public double Z { get; set; }
 
+        /// <summary>
+        /// Applies Helmert transform to ‘this’ point using transform parameters t.
+        /// </summary>
+        /// <param name="transform">Transform to apply to this point.</param>
         public Vector3D ApplyTransform(double[] transform)
         {
             // this point
@@ -43,6 +43,11 @@ namespace geodesy_csharp
             return new Vector3D(X2, Y2, Z2);
         }
 
+        /// <summary>
+        /// Converts ‘this’ (geocentric) cartesian (x/y/z) point to (ellipsoidal geodetic) latitude/longitude coordinates on specified datum.
+        /// Uses Bowring’s (1985) formulation for μm precision in concise form.
+        /// </summary>
+        /// <param name="toDatum">Datum to use when converting point.</param>
         public LatLon ToLatLonE(Datum toDatum)
         {
             var Major = toDatum.Ellipsoid.Major;
