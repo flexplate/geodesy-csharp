@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace geodesy_csharp
+namespace geodesy
 {
     public class Vector3D
     {

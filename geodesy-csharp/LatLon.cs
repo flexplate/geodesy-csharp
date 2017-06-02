@@ -1,96 +1,185 @@
 ﻿using System;
+using System.Linq;
 
-namespace geodesy_csharp
+namespace geodesy
 {
-    public class LatLon
-    {
-        /// <summary>
-        /// Creates lat/lon(polar) point with latitude & longitude values, on a specified datum.
-        /// </summary>
-        /// <param name="latitude">Geodetic latitude in degrees.</param>
-        /// <param name="longitude">Longitude in degrees.</param>
-        /// <param name="datum">Datum this point is defined within.</param>
-        public LatLon(double latitude, double longitude, Datum datum)
-        {
-            this.Latitude = latitude;
-            this.Longitude = longitude;
-            this.Datum = datum;
-        }
+	public class LatLon
+	{
+		/// <summary>
+		/// Creates lat/lon(polar) point with latitude & longitude values, on a specified datum.
+		/// </summary>
+		/// <param name="latitude">Geodetic latitude in degrees.</param>
+		/// <param name="longitude">Longitude in degrees.</param>
+		/// <param name="datum">Datum this point is defined within.</param>
+		public LatLon(double latitude, double longitude, Datum datum)
+		{
+			this.Latitude = latitude;
+			this.Longitude = longitude;
+			this.Datum = datum;
+		}
 
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        public Datum Datum { get; set; }
+		public double Latitude { get; set; }
+		public double Longitude { get; set; }
+		public Datum Datum { get; set; }
 
-        /// <summary>
-        /// /Converts ‘this’ lat/lon coordinate to new coordinate system.
-        /// </summary>
-        /// <param name="toDatum">Datum this coordinate is to be converted to.</param>
-        /// <example>
-        /// var pWGS84 = new LatLon(51.4778, -0.0016, Datum.WGS84);
-        /// var pOSGB = pWGS84.convertDatum(Datum.OSGB36); // 51.4773°N, 000.0000°E
-        /// </example>
-        public LatLon ConvertDatum(Datum toDatum)
-        {
-            LatLon OldLatLon = this;
-            double[] Transform = toDatum.Transform;
-            bool UsingWgs84 = false;
+		/// <summary>
+		/// /Converts ‘this’ lat/lon coordinate to new coordinate system.
+		/// </summary>
+		/// <param name="toDatum">Datum this coordinate is to be converted to.</param>
+		/// <example>
+		/// var pWGS84 = new LatLon(51.4778, -0.0016, Datum.WGS84);
+		/// var pOSGB = pWGS84.convertDatum(Datum.OSGB36); // 51.4773°N, 000.0000°E
+		/// </example>
+		public LatLon ConvertDatum(Datum toDatum)
+		{
+			LatLon OldLatLon = this;
+			double[] Transform = toDatum.Transform;
+			bool UsingWgs84 = false;
 
-            if (OldLatLon.Datum == Datum.WGS84)
-            {
-                // converting from WGS 84
-                Transform = toDatum.Transform;
-                UsingWgs84 = true;
-            }
-            if (toDatum == Datum.WGS84)
-            {
-                // converting to WGS 84; use inverse transform (don't overwrite original!)
-                UsingWgs84 = true;
-                Transform = new double[7];
-                for (var p = 0; p < 7; p++)
-                {
-                    Transform[p] = -OldLatLon.Datum.Transform[p];
-                }
-            }
-            if (!UsingWgs84)
-            {
-                // neither this.datum nor toDatum are WGS84: convert this to WGS84 first
-                OldLatLon = ConvertDatum(Datum.WGS84);
-            }
+			if (OldLatLon.Datum == Datum.WGS84)
+			{
+				// converting from WGS 84
+				Transform = toDatum.Transform;
+				UsingWgs84 = true;
+			}
+			if (toDatum == Datum.WGS84)
+			{
+				// converting to WGS 84; use inverse transform (don't overwrite original!)
+				UsingWgs84 = true;
+				Transform = new double[7];
+				for (var p = 0; p < 7; p++)
+				{
+					Transform[p] = -OldLatLon.Datum.Transform[p];
+				}
+			}
+			if (!UsingWgs84)
+			{
+				// neither this.datum nor toDatum are WGS84: convert this to WGS84 first
+				OldLatLon = ConvertDatum(Datum.WGS84);
+			}
 
-            var OldCartesian = OldLatLon.ToCartesian();                // convert polar to cartesian...
-            var NewCartesian = OldCartesian.ApplyTransform(Transform); // ...apply transform...
-            var NewLatLon = NewCartesian.ToLatLonE(toDatum);           // ...and convert cartesian to polar
+			var OldCartesian = OldLatLon.ToCartesian();                // convert polar to cartesian...
+			var NewCartesian = OldCartesian.ApplyTransform(Transform); // ...apply transform...
+			var NewLatLon = NewCartesian.ToLatLonE(toDatum);           // ...and convert cartesian to polar
 
-            return NewLatLon;
+			return NewLatLon;
 
-        }
+		}
 
-        /// <summary>
-        /// Converts ‘this’ point from (geodetic) latitude/longitude coordinates to (geocentric) cartesian (x/y/z) coordinates.
-        /// </summary>
-        private Vector3D ToCartesian()
-        {
-            var φ = this.Latitude.ToRadians();
-            var λ = this.Longitude.ToRadians();
-            var h = 0; // height above ellipsoid - not currently used
-            var a = this.Datum.Ellipsoid.Major;
-            var f = this.Datum.Ellipsoid.Flattening;
+		/// <summary>
+		/// Converts ‘this’ point from (geodetic) latitude/longitude coordinates to (geocentric) cartesian (x/y/z) coordinates.
+		/// </summary>
+		public Vector3D ToCartesian()
+		{
+			var φ = this.Latitude.ToRadians();
+			var λ = this.Longitude.ToRadians();
+			var h = 0; // height above ellipsoid - not currently used
+			var A = Datum.Ellipsoid.Major;
+			var F = this.Datum.Ellipsoid.Flattening;
 
-            var sinφ = Math.Sin(φ);
-            var cosφ = Math.Cos(φ);
-            var sinλ = Math.Sin(λ);
-            var cosλ = Math.Cos(λ);
+			var Sinφ = Math.Sin(φ);
+			var Cosφ = Math.Cos(φ);
+			var Sinλ = Math.Sin(λ);
+			var Cosλ = Math.Cos(λ);
 
-            var eSq = 2 * f - f * f;                      // 1st eccentricity squared ≡ (a²-b²)/a²
-            var ν = a / Math.Sqrt(1 - eSq * sinφ * sinφ); // radius of curvature in prime vertical
+			var ESq = 2 * F - F * F;                      // 1st eccentricity squared ≡ (a²-b²)/a²
+			var V = A / Math.Sqrt(1 - ESq * Sinφ * Sinφ); // radius of curvature in prime vertical
 
-            var x = (ν + h) * cosφ * cosλ;
-            var y = (ν + h) * cosφ * sinλ;
-            var z = (ν * (1 - eSq) + h) * sinφ;
+			var X = (V + h) * Cosφ * Cosλ;
+			var Y = (V + h) * Cosφ * Sinλ;
+			var Z = (V * (1 - ESq) + h) * Sinφ;
 
-            var point = new Vector3D(x, y, z);
+			var Point = new Vector3D(X, Y, Z);
 
-            return point;
-        }
-    }
+			return Point;
+		}
+
+		public OsGridRef ToGridRef()
+		{
+			// if necessary convert to OSGB36 first
+			if (Datum != Datum.OSGB36)
+			{
+				var Point = new LatLon(Latitude, Longitude, Datum);
+				Point = Point.ConvertDatum(Datum.OSGB36);
+				Latitude = Point.Latitude;
+				Longitude = Point.Longitude;
+				Datum = Datum.OSGB36;
+			}
+
+			var φ = Latitude.ToRadians();
+			var λ = Longitude.ToRadians();
+
+			var A = 6377563.396;
+			var B = 6356256.909;              // Airy 1830 major & minor semi-axes
+			var F0 = 0.9996012717;            // NatGrid scale factor on central meridian
+			var φ0 = (49.0).ToRadians();
+			var λ0 = (-2.0).ToRadians();      // NatGrid true origin is 49°N,2°W
+			var N0 = -100000;
+			var E0 = 400000;                  // northing & easting of true origin, metres
+			var E2 = 1 - (B * B) / (A * A);   // eccentricity squared
+			var N = (A - B) / (A + B);
+			var N2 = N * N;
+			var N3 = N * N * N;         // n, n², n³
+
+			var Cosφ = Math.Cos(φ);
+			var Sinφ = Math.Sin(φ);
+			var ν = A * F0 / Math.Sqrt(1 - E2 * Sinφ * Sinφ);            // nu = transverse radius of curvature
+			var ρ = A * F0 * (1 - E2) / Math.Pow(1 - E2 * Sinφ * Sinφ, 1.5); // rho = meridional radius of curvature
+			var η2 = ν / ρ - 1;                                    // eta = ?
+
+			var Ma = (1 + N + (5 / 4) * N2 + (5 / 4) * N3) * (φ - φ0);
+			var Mb = (3 * N + 3 * N * N + (21 / 8) * N3) * Math.Sin(φ - φ0) * Math.Cos(φ + φ0);
+			var Mc = ((15 / 8) * N2 + (15 / 8) * N3) * Math.Sin(2 * (φ - φ0)) * Math.Cos(2 * (φ + φ0));
+			var Md = (35 / 24) * N3 * Math.Sin(3 * (φ - φ0)) * Math.Cos(3 * (φ + φ0));
+			var M = B * F0 * (Ma - Mb + Mc - Md);              // meridional arc
+
+			var Cos3φ = Cosφ * Cosφ * Cosφ;
+			var Cos5φ = Cos3φ * Cosφ * Cosφ;
+			var tan2φ = Math.Tan(φ) * Math.Tan(φ);
+			var tan4φ = tan2φ * tan2φ;
+
+			var I = M + N0;
+			var II = (ν / 2) * Sinφ * Cosφ;
+			var III = (ν / 24) * Sinφ * Cos3φ * (5 - tan2φ + 9 * η2);
+			var IIIA = (ν / 720) * Sinφ * Cos5φ * (61 - 58 * tan2φ + tan4φ);
+			var IV = ν * Cosφ;
+			var V = (ν / 6) * Cos3φ * (ν / ρ - tan2φ);
+			var VI = (ν / 120) * Cos5φ * (5 - 18 * tan2φ + tan4φ + 14 * η2 - 58 * tan2φ * η2);
+
+			var Δλ = λ - λ0;
+			var Δλ2 = Δλ * Δλ;
+			var Δλ3 = Δλ2 * Δλ;
+			var Δλ4 = Δλ3 * Δλ;
+			var Δλ5 = Δλ4 * Δλ;
+			var Δλ6 = Δλ5 * Δλ;
+
+			var North = I + II * Δλ2 + III * Δλ4 + IIIA * Δλ6;
+			var East = E0 + IV * Δλ + V * Δλ3 + VI * Δλ5;
+
+			North = Math.Round(North, 3); //North.toFixed(3)); // round to mm precision
+			East = Math.Round(East, 3);
+
+			return new OsGridRef(East, North); // gets truncated to SW corner of 1m grid square
+		}
+
+		public string ToString(string format, int decimals)
+		{
+			format = format.ToLower();
+			if (new string[] { "d", "dm", "dms" }.Contains(format))
+			{
+				if ((decimals >= 0) && (decimals % 2 == 0) && decimals <= 4)
+				{
+					return DMS.ToLat(Latitude, format, decimals) + ", " + DMS.ToLon(Longitude, format, decimals);
+				}
+				else
+				{
+					throw new ArgumentException("Decimals must be 0, 2 or 4");
+				}
+			}
+			else
+			{
+				throw new ArgumentException("Format must be d|dm|dms");
+			}
+		}
+	}
 }
