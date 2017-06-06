@@ -1,10 +1,8 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using geodesy;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace geodesy.test
 {
-    [TestClass]
+	[TestClass]
     public class DmsTest
     {
 		#region Zero Degrees

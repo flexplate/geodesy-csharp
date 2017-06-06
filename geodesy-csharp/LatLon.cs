@@ -111,12 +111,12 @@ namespace geodesy
 
 			var A = 6377563.396;
 			var B = 6356256.909;              // Airy 1830 major & minor semi-axes
-			var F0 = 0.9996012717;            // NatGrid scale factor on central meridian
+			var F0 = 0.9996012717;                             // NatGrid scale factor on central meridian
 			var φ0 = (49.0).ToRadians();
-			var λ0 = (-2.0).ToRadians();      // NatGrid true origin is 49°N,2°W
+			var λ0 = (-2.0).ToRadians();  // NatGrid true origin is 49°N,2°W
 			var N0 = -100000;
-			var E0 = 400000;                  // northing & easting of true origin, metres
-			var E2 = 1 - (B * B) / (A * A);   // eccentricity squared
+			var E0 = 400000;                     // northing & easting of true origin, metres
+			var E2 = 1 - (B * B) / (A * A);                          // eccentricity squared
 			var N = (A - B) / (A + B);
 			var N2 = N * N;
 			var N3 = N * N * N;         // n, n², n³
@@ -127,24 +127,24 @@ namespace geodesy
 			var ρ = A * F0 * (1 - E2) / Math.Pow(1 - E2 * Sinφ * Sinφ, 1.5); // rho = meridional radius of curvature
 			var η2 = ν / ρ - 1;                                    // eta = ?
 
-			var Ma = (1 + N + (5 / 4) * N2 + (5 / 4) * N3) * (φ - φ0);
-			var Mb = (3 * N + 3 * N * N + (21 / 8) * N3) * Math.Sin(φ - φ0) * Math.Cos(φ + φ0);
-			var Mc = ((15 / 8) * N2 + (15 / 8) * N3) * Math.Sin(2 * (φ - φ0)) * Math.Cos(2 * (φ + φ0));
+			var Ma = (1 + N + 1.25 * N2 + 1.25 * N3) * (φ - φ0);
+			var Mb = (3 * N + 3 * N * N + 2.625 * N3) * Math.Sin(φ - φ0) * Math.Cos(φ + φ0);
+			var Mc = (1.875 * N2 + 1.875 * N3) * Math.Sin(2 * (φ - φ0)) * Math.Cos(2 * (φ + φ0));
 			var Md = (35 / 24) * N3 * Math.Sin(3 * (φ - φ0)) * Math.Cos(3 * (φ + φ0));
 			var M = B * F0 * (Ma - Mb + Mc - Md);              // meridional arc
 
 			var Cos3φ = Cosφ * Cosφ * Cosφ;
 			var Cos5φ = Cos3φ * Cosφ * Cosφ;
-			var tan2φ = Math.Tan(φ) * Math.Tan(φ);
-			var tan4φ = tan2φ * tan2φ;
+			var Tan2φ = Math.Tan(φ) * Math.Tan(φ);
+			var Tan4φ = Tan2φ * Tan2φ;
 
 			var I = M + N0;
 			var II = (ν / 2) * Sinφ * Cosφ;
-			var III = (ν / 24) * Sinφ * Cos3φ * (5 - tan2φ + 9 * η2);
-			var IIIA = (ν / 720) * Sinφ * Cos5φ * (61 - 58 * tan2φ + tan4φ);
+			var III = (ν / 24) * Sinφ * Cos3φ * (5 - Tan2φ + 9 * η2);
+			var IIIA = (ν / 720) * Sinφ * Cos5φ * (61 - 58 * Tan2φ + Tan4φ);
 			var IV = ν * Cosφ;
-			var V = (ν / 6) * Cos3φ * (ν / ρ - tan2φ);
-			var VI = (ν / 120) * Cos5φ * (5 - 18 * tan2φ + tan4φ + 14 * η2 - 58 * tan2φ * η2);
+			var V = (ν / 6) * Cos3φ * (ν / ρ - Tan2φ);
+			var VI = (ν / 120) * Cos5φ * (5 - 18 * Tan2φ + Tan4φ + 14 * η2 - 58 * Tan2φ * η2);
 
 			var Δλ = λ - λ0;
 			var Δλ2 = Δλ * Δλ;
