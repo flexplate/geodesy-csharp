@@ -31,7 +31,7 @@ namespace geodesy
 		/// to obtain (historical) OSGB36 latitude/longitude point:
 		/// var pOsgb = OsGridRef.osGridToLatLon(gridref, LatLon.datum.OSGB36); // 52°39′27.253″N, 001°43′04.518″E
 		///</example>
-		public LatLon ToLatLon(Datum datum)
+		public LatLonEllipsoidal ToLatLon(Datum datum)
 		{
 			double E = Easting;
 			double N = Northing;
@@ -95,7 +95,7 @@ namespace geodesy
 			φ = φ - VII * dE2 + VIII * dE4 - IX * dE6;
 			double λ = λ0 + X * dE - XI * dE3 + XII * dE5 - XIIA * dE7;
 
-			var Point = new LatLon(φ.ToDegrees(), λ.ToDegrees(), Datum.OSGB36);
+			var Point = new LatLonEllipsoidal(φ.ToDegrees(), λ.ToDegrees(), Datum.OSGB36);
 			if (datum != Datum.OSGB36) Point = Point.ConvertDatum(datum);
 
 			return Point;

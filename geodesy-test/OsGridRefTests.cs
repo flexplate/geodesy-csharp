@@ -8,21 +8,21 @@ namespace geodesy.test
 		[TestMethod]
 		public void C1E()
 		{
-			var Osgb = new LatLon(DMS.ParseDMS("52°39′27.2531″N"), DMS.ParseDMS("1°43′4.5177″E"), Datum.OSGB36);
+			var Osgb = new LatLonEllipsoidal(DMS.ParseDMS("52°39′27.2531″N"), DMS.ParseDMS("1°43′4.5177″E"), Datum.OSGB36);
 			var GridRef = Osgb.ToGridRef();
 			Assert.AreEqual(651409.903, GridRef.Easting);
 		}
 		[TestMethod]
 		public void C1N()
 		{
-			var Osgb = new LatLon(DMS.ParseDMS("52°39′27.2531″N"), DMS.ParseDMS("1°43′4.5177″E"), Datum.OSGB36);
+			var Osgb = new LatLonEllipsoidal(DMS.ParseDMS("52°39′27.2531″N"), DMS.ParseDMS("1°43′4.5177″E"), Datum.OSGB36);
 			var GridRef = Osgb.ToGridRef();
 			Assert.AreEqual(313177.270, GridRef.Northing);
 		}
 		[TestMethod]
 		public void C1RoundTrip()
 		{
-			var Osgb = new LatLon(DMS.ParseDMS("52°39′27.2531″N"), DMS.ParseDMS("1°43′4.5177″E"), Datum.OSGB36);
+			var Osgb = new LatLonEllipsoidal(DMS.ParseDMS("52°39′27.2531″N"), DMS.ParseDMS("1°43′4.5177″E"), Datum.OSGB36);
 			var GridRef = Osgb.ToGridRef();
 			var OsGb2 = GridRef.ToLatLon(Datum.OSGB36);
 		}
@@ -79,14 +79,14 @@ namespace geodesy.test
 		[TestMethod]
 		public void ConvertWgs84ToOsgb36()
 		{
-			var GreenwichWGS84 = new LatLon(51.4778, -0.0016, Datum.WGS84); // default WGS84
+			var GreenwichWGS84 = new LatLonEllipsoidal(51.4778, -0.0016, Datum.WGS84); // default WGS84
 			var GreenwichOSGB36 = GreenwichWGS84.ConvertDatum(Datum.OSGB36);
 			Assert.AreEqual("51.4773°" + DMS.Separator + "N, 000.0000°" + DMS.Separator + "E", GreenwichOSGB36.ToString("d", 4));
 		}
 		[TestMethod]
 		public void ConvertOsgb36ToWgs84()
 		{
-			var GreenwichWGS84 = new LatLon(51.4778, -0.0016, Datum.WGS84); // default WGS84
+			var GreenwichWGS84 = new LatLonEllipsoidal(51.4778, -0.0016, Datum.WGS84); // default WGS84
 			var GreenwichOSGB36 = GreenwichWGS84.ConvertDatum(Datum.OSGB36);
 			Assert.AreEqual("51.4778°" + DMS.Separator + "N, 000.0016°" + DMS.Separator + "W", GreenwichOSGB36.ConvertDatum(Datum.WGS84).ToString("d", 4));
 		}
@@ -130,14 +130,14 @@ namespace geodesy.test
 		public void DgRoundTripOsgb36()
 		{
 			OsGridRef DgGridRef = OsGridRef.Parse("TQ 44359 80653");
-			LatLon DgOsgb = DgGridRef.ToLatLon(Datum.OSGB36);
+			LatLonEllipsoidal DgOsgb = DgGridRef.ToLatLon(Datum.OSGB36);
 			Assert.AreEqual(DgOsgb.ToGridRef().ToString(), DgGridRef.ToString());
 		}
 		[TestMethod]
 		public void DgRoundTripOsgb36Numeric()
 		{
 			OsGridRef DgGridRef = OsGridRef.Parse("TQ 44359 80653");
-			LatLon DgOsgb = DgGridRef.ToLatLon(Datum.OSGB36);
+			LatLonEllipsoidal DgOsgb = DgGridRef.ToLatLon(Datum.OSGB36);
 			Assert.AreEqual("544359,180653", DgOsgb.ToGridRef().ToString(0));
 		}
 		#endregion
