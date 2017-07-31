@@ -51,5 +51,40 @@ namespace geodesy
 
 			return (θ.ToDegrees() + 360) % 360;
 		}
+
+		/// <summary>
+		/// Returns final bearing arriving at destination destination point from this point; the final bearing
+		/// will differ from the initial bearing by varying degrees according to distance and latitude.
+		/// </summary>
+		/// <param name="point">Destination point.</param>
+		/// <returns>Final bearing in degrees from north.</returns>
+		public double FinalBearingTo(LatLonSpherical point)
+		{
+			return (point.BearingTo(this) + 180) % 360;
+		}
+
+		/// <summary>
+		/// Returns the midpoint between this point and the supplied point.
+		/// </summary>
+		/// <param name="point">Destination point.</param>
+		/// <returns>Midpoint between this point and the supplied point.</returns>
+		public LatLon MidpointTo(LatLon point)
+		{
+			var φ1 = Latitude.ToRadians();
+			var λ1 = Longitude.ToRadians();
+			var φ2 = point.Latitude.ToRadians();
+			var Δλ = (point.Longitude - this.Longitude).ToRadians();
+
+			var Bx = Math.Cos(φ2) * Math.Cos(Δλ);
+			var By = Math.Cos(φ2) * Math.Sin(Δλ);
+
+			var X = Math.Sqrt((Math.Cos(φ1) + Bx) * (Math.Cos(φ1) + Bx) + By * By);
+			var Y = Math.Sin(φ1) + Math.Sin(φ2);
+			var φ3 = Math.Atan2(Y, X);
+
+			var λ3 = λ1 + Math.Atan2(By, Math.Cos(φ1) + Bx);
+
+			return new LatLon(φ3.ToDegrees(), (λ3.ToDegrees() + 540) % 360 - 180); // normalise to −180..+180°
+		}
 	}
 }

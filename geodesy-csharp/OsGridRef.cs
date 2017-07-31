@@ -31,6 +31,7 @@ namespace geodesy
 		/// to obtain (historical) OSGB36 latitude/longitude point:
 		/// var pOsgb = OsGridRef.osGridToLatLon(gridref, LatLon.datum.OSGB36); // 52°39′27.253″N, 001°43′04.518″E
 		///</example>
+		///<remarks>Currently not accurate enough, owing to a lack of precision in C#'s number handling. Will be ported to use arbitrary-precision maths.</remarks>
 		public LatLonEllipsoidal ToLatLon(Datum datum)
 		{
 			double E = Easting;
