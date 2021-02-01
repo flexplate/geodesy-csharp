@@ -28,7 +28,7 @@ jobs:
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: a05c7c692c31842ce1e6e136b71654cc
-        filename: GeodesyBuildBadge
+        filename: GeodesyBuildBadge.json
         label: Build status
         message: Success
         color: green
@@ -38,7 +38,7 @@ jobs:
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: a05c7c692c31842ce1e6e136b71654cc
-        filename: GeodesyBuildBadge 
+        filename: GeodesyBuildBadge.json 
         label: Build status
         message: Failed
         color: red        
@@ -48,7 +48,7 @@ jobs:
     steps:
 
       - name: Run tests
-        uses: zyborg/dotnet-tests-report@v1
+        uses: zyborg/dotnet-tests-report@v1.3.0
         with:
           report_title: Test report
           github_token: ${{ secrets.WORKFLOW_SECRET }}
