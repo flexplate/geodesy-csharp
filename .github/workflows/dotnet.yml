@@ -1,0 +1,59 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      id: buildstep
+      run: dotnet build --no-restore
+      continue-on-error: true
+    - name: Create success badge
+      if: steps.buildstep.conclusion == 'success'
+      uses: schneegans/dynamic-badges-action@v1.0.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: <gist-ID>
+        filename: test.json
+        label: Build status
+        message: Success
+        color: green
+    - name: Create failure badge
+      if: steps.buildstep.conclusion == 'success'
+      uses: schneegans/dynamic-badges-action@v1.0.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: <gist-ID>
+        filename: test.json
+        label: Build status
+        message: Failed
+        color: red        
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Run tests
+        uses: zyborg/dotnet-tests-report@v1
+        with:
+          project_path: geodesy-test/geodesy-test
+          report_name: geodesy-test
+          report_title: Test report
+          github_token: ${{ secrets.WORKFLOW_SECRET }}
+          gist_name: geodesy-test-report.md
+          gist_badge_label: 'Test: %Counters_passed%/%Counters_total%'
+          gist_token: ${{ secrets.GIST_SECRET }}
