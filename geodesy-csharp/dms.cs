@@ -145,7 +145,7 @@ namespace geodesy
 		public static string ToLat(double degrees, string format, int? decimals = null)
 		{
 			var Lat = ToDMS(degrees, format, decimals);
-			return Lat == null ? "-" : Lat.Substring(1) + Separator + (degrees	< 0 ? 'S' : 'N');  // knock off initial '0' for lat!
+			return Lat == null ? "-" : Lat.Substring(1) + (degrees	< 0 ? 'S' : 'N');  // knock off initial '0' for lat!
 		}
 		public static string ToLat(string degreeString, string format, int? decimals = null)
 		{
@@ -156,7 +156,7 @@ namespace geodesy
 		public static string ToLon(double degrees, string format, int? decimals = null)
 		{
 			var Lon = ToDMS(degrees, format, decimals);
-			return Lon == null ? "-" : Lon + Separator + (degrees < 0 ? 'W' : 'E');
+			return Lon == null ? "-" : Lon + (degrees < 0 ? 'W' : 'E');
 		}
 		public static string ToLon(string degreeString, string format, int? decimals = null)
 		{

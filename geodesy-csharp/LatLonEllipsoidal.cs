@@ -5,13 +5,14 @@ namespace geodesy
 {
 	public class LatLonEllipsoidal : LatLon
 	{
-		/// <summary>
-		/// Creates lat/lon(polar) point with latitude & longitude values, on a specified datum.
-		/// </summary>
-		/// <param name="latitude">Geodetic latitude in degrees.</param>
-		/// <param name="longitude">Longitude in degrees.</param>
-		/// <param name="datum">Datum this point is defined within.</param>
-		public LatLonEllipsoidal(double latitude, double longitude, Datum datum) : base(latitude,longitude)
+
+        /// <summary>
+        /// Creates lat/lon(polar) point with latitude & longitude values, on a specified datum.
+        /// </summary>
+        /// <param name="latitude">Geodetic latitude in degrees.</param>
+        /// <param name="longitude">Longitude in degrees.</param>
+        /// <param name="datum">Datum this point is defined within.</param>
+        public LatLonEllipsoidal(double latitude, double longitude, Datum datum) : base(latitude,longitude)
 		{
 			Latitude = latitude;
 			Longitude = longitude;
@@ -128,7 +129,7 @@ namespace geodesy
 			var Ma = (1 + N + 1.25 * N2 + 1.25 * N3) * (φ - φ0);
 			var Mb = (3 * N + 3 * N * N + 2.625 * N3) * Math.Sin(φ - φ0) * Math.Cos(φ + φ0);
 			var Mc = (1.875 * N2 + 1.875 * N3) * Math.Sin(2 * (φ - φ0)) * Math.Cos(2 * (φ + φ0));
-			var Md = (35 / 24) * N3 * Math.Sin(3 * (φ - φ0)) * Math.Cos(3 * (φ + φ0));
+			var Md = 35.0/24.0 * N3 * Math.Sin(3 * (φ - φ0)) * Math.Cos(3 * (φ + φ0));
 			var M = B * F0 * (Ma - Mb + Mc - Md);              // meridional arc
 
 			var Cos3φ = Cosφ * Cosφ * Cosφ;
