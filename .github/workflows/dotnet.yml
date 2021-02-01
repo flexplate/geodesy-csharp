@@ -50,7 +50,6 @@ jobs:
       - name: Run tests
         uses: zyborg/dotnet-tests-report@v1
         with:
-          project_path: geodesy-test
           report_title: Test report
           github_token: ${{ secrets.WORKFLOW_SECRET }}
           gist_name: GeodesyTestReport.md
