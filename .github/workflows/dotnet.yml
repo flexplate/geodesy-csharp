@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  buildbadge.filename: GeodesyBuildBadge.json
+  buildbadge.gistId: a05c7c692c31842ce1e6e136b71654cc
+  buildbadge.label: Build status
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,37 +21,46 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+    
     - name: Restore dependencies
       run: dotnet restore
+      
     - name: Build
       id: buildstep
       run: dotnet build --no-restore
       continue-on-error: true
+      
     - name: Create success badge
       if: steps.buildstep.conclusion == 'success'
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: a05c7c692c31842ce1e6e136b71654cc
-        filename: GeodesyBuildBadge.json
-        label: Build status
+        gistID: ${{ env.buildbadge.gistId }}
+        filename: ${{ env.buildbadge.filename }}
+        label: ${{ env.buildbadge.label }}
         message: Success
         color: green
+    
     - name: Create failure badge
       if: steps.buildstep.conclusion == 'failure'
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: a05c7c692c31842ce1e6e136b71654cc
-        filename: GeodesyBuildBadge.json 
-        label: Build status
+        gistID: ${{ env.buildbadge.gistId }}
+        filename: ${{ env.buildbadge.filename }}
+        label: ${{ env.buildbadge.label }}
         message: Failed
         color: red        
 
   test:
     runs-on: ubuntu-latest
     steps:
-
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      
       - name: Run tests
         uses: zyborg/dotnet-tests-report@v1.3.0
         with:
