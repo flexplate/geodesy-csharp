@@ -27,7 +27,7 @@ jobs:
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: <gist-ID>
+        gistID: a05c7c692c31842ce1e6e136b71654cc
         filename: GeodesyBuildBadge
         label: Build status
         message: Success
@@ -37,7 +37,7 @@ jobs:
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: <gist-ID>
+        gistID: a05c7c692c31842ce1e6e136b71654cc
         filename: GeodesyBuildBadge 
         label: Build status
         message: Failed
@@ -50,7 +50,7 @@ jobs:
       - name: Run tests
         uses: zyborg/dotnet-tests-report@v1
         with:
-          project_path: geodesy-test/geodesy-test.csproj
+          project_path: geodesy-test
           report_title: Test report
           github_token: ${{ secrets.WORKFLOW_SECRET }}
           gist_name: GeodesyTestReport.md
