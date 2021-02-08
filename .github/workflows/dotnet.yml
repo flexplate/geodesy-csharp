@@ -57,6 +57,6 @@ jobs:
       with:
         report_title: Test report
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        gist_name: GeodesyTestReport.md
+        gist_name: GeodesyTestReport
         gist_badge_label: 'Test status: %Counters_passed%/%Counters_total%'
         gist_token: ${{ secrets.GIST_SECRET }}
