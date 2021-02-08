@@ -7,9 +7,9 @@ on:
     branches: [ master ]
 
 env:
-  buildbadge.filename: GeodesyBuildBadge.json
-  buildbadge.gistId: a05c7c692c31842ce1e6e136b71654cc
-  buildbadge.label: Build status
+  buildBadgeFilename: GeodesyBuildBadge.json
+  buildBadgeGistId: a05c7c692c31842ce1e6e136b71654cc
+  buildBadgeLabel: Build status
 
 jobs:
   build:
@@ -35,9 +35,9 @@ jobs:
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: ${{ env.buildbadge.gistId }}
-        filename: ${{ env.buildbadge.filename }}
-        label: ${{ env.buildbadge.label }}
+        gistID: ${{ env.buildBadgeGistId }}
+        filename: ${{ env.buildBadgeFilename }}
+        label: ${{ env.buildBadgeLabel }}
         message: Success
         color: green
     
@@ -50,22 +50,13 @@ jobs:
         filename: ${{ env.buildbadge.filename }}
         label: ${{ env.buildbadge.label }}
         message: Failed
-        color: red        
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.x
-      
-      - name: Run tests
-        uses: zyborg/dotnet-tests-report@v1.3.0
-        with:
-          report_title: Test report
-          github_token: ${{ secrets.WORKFLOW_SECRET }}
-          gist_name: GeodesyTestReport.md
-          gist_badge_label: 'Test status: %Counters_passed%/%Counters_total%'
-          gist_token: ${{ secrets.GIST_SECRET }}
+        color: red         
+    
+    - name: Run tests
+      uses: zyborg/dotnet-tests-report@v1.3.0
+      with:
+        report_title: Test report
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        gist_name: GeodesyTestReport.md
+        gist_badge_label: 'Test status: %Counters_passed%/%Counters_total%'
+        gist_token: ${{ secrets.GIST_SECRET }}
