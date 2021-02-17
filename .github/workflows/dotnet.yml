@@ -10,7 +10,9 @@ env:
   buildBadgeFilename: GeodesyBuildBadge.json
   buildBadgeGistId: a05c7c692c31842ce1e6e136b71654cc
   buildBadgeLabel: Build status
-
+  testBadgeFilename: GeodesyTestBadge.json
+  testBadgeGistId: bd26f1a5c130ac7204eb24395747732c
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,33 +32,83 @@ jobs:
       run: dotnet build --no-restore
       continue-on-error: true
       
-    - name: Create success badge
+    - name: Set success vars for build badge      
       if: steps.buildstep.conclusion == 'success'
+      run: |
+         export BUILDMSG=Success
+         echo "::set-env name=buildBadgeMessage::BUILDMSG"
+         export BUILDCLR=Green
+         echo "::set-env name=buildBadgeColour::BUILDCLR"
+         
+    - name: Set fail vars for build badge      
+      if: steps.buildstep.conclusion == 'failure'
+      run: |
+         export BUILDMSG=Failed
+         echo "::set-env name=buildBadgeMessage::BUILDMSG"
+         export BUILDCLR=Red
+         echo "::set-env name=buildBadgeColour::BUILDCLR"
+      
+          
+    - name: Create build badge
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: ${{ env.buildBadgeGistId }}
         filename: ${{ env.buildBadgeFilename }}
         label: ${{ env.buildBadgeLabel }}
-        message: Success
-        color: green
+        message: ${{ env.buildBadgeMessage }}
+        color: ${{ env.buildBadgeColour }}
     
-    - name: Create failure badge
-      if: steps.buildstep.conclusion == 'failure'
+    - name: Run tests
+      id: test
+      run: dotnet test --no-build --logger "trx;LogFileName=geodesy.trx
+      
+    - name: Upload dotnet test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: dotnet-results
+        path: TestResults
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
+        
+    - name: Get test count
+      id: testcount
+      uses: QwerMike/xpath-action@v1
+      with:
+        filename: 'TestResults/geodesy.trx'
+        expression: '/ns0:TestRun/ns0:ResultSummary/ns0:Counters/@total'
+        namespaces: '{"ns0":"http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}'
+       
+    - name: Get test passes
+      id: testpasscount
+      uses: QwerMike/xpath-action@v1
+      with:
+        filename: 'TestResults/geodesy.trx'
+        expression: '/ns0:TestRun/ns0:ResultSummary/ns0:Counters/@passed'
+        namespaces: '{"ns0":"http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}'
+        
+    - name: Create test badge label
+      run: echo "::set-env name=testBadgeLabel::Tests ${{ steps.testpasscount.result }}/${{ steps.testcount.result }}"
+        
+    - name: Set test badge success message  
+      if: steps.testpasscount.result == steps.testcount.result
+      run: |
+         echo "::set-env name=testBadgeMessage::Success"
+         echo "::set-env name=testBadgeColour::Green"
+         
+    - name: Set test badge success message  
+      if: steps.testpasscount.result != steps.testcount.result
+      run: |
+         echo "::set-env name=testBadgeMessage::Failure"
+         echo "::set-env name=testBadgeColour::Red"
+      
+        
+    - name: Create test badge
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: ${{ env.buildbadge.gistId }}
-        filename: ${{ env.buildbadge.filename }}
-        label: ${{ env.buildbadge.label }}
-        message: Failed
-        color: red         
-    
-    - name: Run tests
-      uses: zyborg/dotnet-tests-report@v1.3.0
-      with:
-        report_title: Test report
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        gist_name: GeodesyTestReport
-        gist_badge_label: 'Test status: %Counters_passed%/%Counters_total%'
-        gist_token: ${{ secrets.GIST_SECRET }}
+        gistID: ${{ env.testBadgeGistId }}
+        filename: ${{ env.testBadgeFilename }}
+        label: ${{ env.testBadgeLabel }}
+        message:  ${{ env.testBadgeMessage }}
+        color: ${{ env.testBadgeColour }}
