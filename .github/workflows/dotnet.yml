@@ -35,19 +35,14 @@ jobs:
     - name: Set success vars for build badge      
       if: steps.buildstep.conclusion == 'success'
       run: |
-         export BUILDMSG=Success
-         echo "::set-env name=buildBadgeMessage::BUILDMSG"
-         export BUILDCLR=Green
-         echo "::set-env name=buildBadgeColour::BUILDCLR"
+         echo "buildBadgeMessage=Success" >> $GITHUB_ENV
+         echo "buildBadgeColour=Green" >> $GITHUB_ENV
          
     - name: Set fail vars for build badge      
       if: steps.buildstep.conclusion == 'failure'
       run: |
-         export BUILDMSG=Failed
-         echo "::set-env name=buildBadgeMessage::BUILDMSG"
-         export BUILDCLR=Red
-         echo "::set-env name=buildBadgeColour::BUILDCLR"
-      
+         echo "buildBadgeMessage=Failed" >> $GITHUB_ENV
+         echo "buildBadgeColour=Red" >> $GITHUB_ENV      
           
     - name: Create build badge
       uses: schneegans/dynamic-badges-action@v1.0.0
@@ -86,20 +81,19 @@ jobs:
         namespaces: '{"ns0":"http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}'
         
     - name: Create test badge label
-      run: echo "::set-env name=testBadgeLabel::Tests ${{ steps.testpasscount.result }}/${{ steps.testcount.result }}"
+      run: echo "testBadgeLabel=Tests ${{ steps.testpasscount.result }}/${{ steps.testcount.result }}" >> $GITHUB_ENV
         
     - name: Set test badge success message  
       if: steps.testpasscount.result == steps.testcount.result
       run: |
-         echo "::set-env name=testBadgeMessage::Success"
-         echo "::set-env name=testBadgeColour::Green"
+         echo "testBadgeMessage=Success" >> $GITHUB_ENV
+         echo "testBadgeColour=Green" >> $GITHUB_ENV
          
     - name: Set test badge success message  
       if: steps.testpasscount.result != steps.testcount.result
       run: |
-         echo "::set-env name=testBadgeMessage::Failure"
-         echo "::set-env name=testBadgeColour::Red"
-      
+         echo "testBadgeMessage=Failure" >> $GITHUB_ENV
+         echo "testBadgeColour=Red" >> $GITHUB_ENV      
         
     - name: Create test badge
       uses: schneegans/dynamic-badges-action@v1.0.0
