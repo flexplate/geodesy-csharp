@@ -60,6 +60,7 @@ jobs:
       
     - name: Upload dotnet test results
       uses: actions/upload-artifact@v2
+      continue-on-error: true
       with:
         name: dotnet-results
         path: TestResults
