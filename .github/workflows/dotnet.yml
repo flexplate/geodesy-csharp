@@ -56,7 +56,7 @@ jobs:
     
     - name: Run tests
       id: test
-      run: dotnet test --no-build --logger "trx;LogFileName=geodesy.trx
+      run: dotnet test --no-build --logger "trx;LogFileName=geodesy.trx"
       
     - name: Upload dotnet test results
       uses: actions/upload-artifact@v2
