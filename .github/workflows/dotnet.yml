@@ -56,11 +56,11 @@ jobs:
     
     - name: Run tests
       id: test
+      continue-on-error: true
       run: dotnet test --no-build --logger "trx;LogFileName=geodesy.trx"
       
     - name: Upload dotnet test results
       uses: actions/upload-artifact@v2
-      continue-on-error: true
       with:
         name: dotnet-results
         path: TestResults
