@@ -69,7 +69,7 @@ jobs:
       id: testcount
       uses: QwerMike/xpath-action@v1
       with:
-        filename: 'TestResults/geodesy.trx'
+        filename: '/home/runner/work/geodesy-csharp/geodesy-csharp/geodesy-test/TestResults/geodesy.trx'
         expression: '/ns0:TestRun/ns0:ResultSummary/ns0:Counters/@total'
         namespaces: '{"ns0":"http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}'
        
@@ -77,7 +77,7 @@ jobs:
       id: testpasscount
       uses: QwerMike/xpath-action@v1
       with:
-        filename: 'TestResults/geodesy.trx'
+        filename: '/home/runner/work/geodesy-csharp/geodesy-csharp/geodesy-test/TestResults/geodesy.trx'
         expression: '/ns0:TestRun/ns0:ResultSummary/ns0:Counters/@passed'
         namespaces: '{"ns0":"http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}'
         
