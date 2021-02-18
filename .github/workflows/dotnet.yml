@@ -63,7 +63,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: dotnet-results
-        path: TestResults/geodesy.trx
+        path: /home/runner/work/geodesy-csharp/geodesy-csharp/geodesy-test/TestResults/geodesy.trx
         
     - name: Get test count
       id: testcount
